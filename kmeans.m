@@ -626,7 +626,8 @@ end
                 % Find clusters that gained or lost members
                 changed = unique([idx(moved); previdx(moved)])';
                 %----------------------Log----------------------%
-                idxList = [idxList; idx'];
+                idxnIter = [iter idx'];
+                idxList = [idxList; idxnIter];
                 %----------------------Log----------------------%
             end % phase one
             %----------------------Log----------------------%
