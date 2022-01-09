@@ -179,7 +179,14 @@ pnames = {   'distance'  'start' 'replicates' 'emptyaction' 'onlinephase' 'optio
 dflts =  {'sqeuclidean' 'plus'          []  'singleton'         'off'        []        []        []};
 [distance,start,reps,emptyact,online,options,maxit,display] ...
     = internal.stats.parseArgs(pnames, dflts, varargin{:});
-
+% % % % % % % % distance
+% % % % % % % %     start
+% % % % % % % %     reps
+% % % % % % % %     emptyact
+% % % % % % % %     online
+% % % % % % % %     options
+% % % % % % % %     maxit
+% % % % % % % %     display
 distNames = {'sqeuclidean','cityblock','cosine','correlation','hamming'};
 distance = internal.stats.getParamVal(distance,distNames,'''Distance''');
 
@@ -446,19 +453,18 @@ end
                     end
                     sampleProbability = minDist/denominator;
                     [C(:,ii), index(ii)] = datasample(S,X,1,2,'Replace',false,...
-                        'Weights',sampleProbability);        
-                end
+                        'Weights',sampleProbability);      
+               end
         end
         if ~isfloat(C)      % X may be logical
             C = double(C);
         end
-        
+        writematrix(C','KMpp_CCenter.csv'); 
         % Compute the distance from every point to each cluster centroid and the
         % initial assignment of points to clusters
         D = distfun(X, C, distance, 0, rep, reps);
         [d, idx] = min(D, [], 2);
         m = accumarray(idx,1,[k,1])';
-        
         try % catch empty cluster errors and move on to next rep
             
             % Begin phase one:  batch reassignments
@@ -509,9 +515,11 @@ end
         end % catch
         
         %------------------------------------------------------------------
+
         
         function converged = batchUpdate()
-            
+            % Log ------------
+            idxList = [];    
             % Every point moved, every cluster will need an update
             moved = 1:n;
             changed = 1:k;
@@ -620,15 +628,17 @@ end
                 
                 % Find clusters that gained or lost members
                 changed = unique([idx(moved); previdx(moved)])';
-                
+                %Log---------------------
+                idxList = [idxList; idx'];
             end % phase one
-            
+            %Log ----------------
+            writematrix(idxList,'KMpp_iter.csv');     
         end % nested function
+        
         
         %------------------------------------------------------------------
         
         function converged = onlineUpdate()
-                       
             %
             % Begin phase two:  single reassignments
             %
