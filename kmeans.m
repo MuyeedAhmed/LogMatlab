@@ -515,7 +515,13 @@ end
         
         function converged = batchUpdate()
             %----------------------Log----------------------%
-            idxList = [];
+            filename = 'Data/KMpp_matlab.csv';
+            if isfile(filename)
+                prevIdxList = readtable(filename, 'ReadVariableNames', false);
+                idxList = prevIdxList{:,:};
+            else
+                idxList = [];   
+            end
             %----------------------Log----------------------%
             % Every point moved, every cluster will need an update
             moved = 1:n;
